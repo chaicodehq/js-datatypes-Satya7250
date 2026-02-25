@@ -63,4 +63,85 @@
  */
 export function validateForm(formData) {
   // Your code here
+  const error = {};
+
+  const name = formData?.name?.trim() ?? "";
+  if(typeof name !== "string" || name.length<2 || name.length >50){
+    error.name = "Name must be 2-50 characters";
+  };
+  
+  const email = formData?.email?.trim() ?? "";
+  if(typeof email !== "string"){
+    error.email = "Invalid email format";
+  }else{
+    const index = email.indexOf("@");
+    const lIndex = email.lastIndexOf("@");
+    const dotIndex = email.indexOf(".",index+1);
+
+    if(index !== lIndex || dotIndex === -1 || index === -1){
+      error.email = "Invalid email format";
+    }
+  }
+
+  const phone = formData?.phone?.trim() ?? "";
+  if(typeof phone !== "string" || phone.length !== 10 ){
+    error.phone = "Invalid Indian phone number";
+  }else{
+    const validStart = ["6","7","8","9"].includes(phone[0]);
+    let allDegit = true;
+    for(let i=0; i<phone.length; i++){
+      if(phone[i] < "0" || phone[i] > "9"){
+        allDegit = false;
+        break;
+      }
+    }
+    if(!validStart || !allDegit){
+      error.phone = "Invalid Indian phone number";
+    }
+  }
+
+  let age = formData?.age;
+  if(typeof age === "string"){
+    age = parseInt(age,10);
+  }
+  if(typeof age !== "number"|| isNaN(age) || age<16 || age>100 || !Number.isInteger(age)){
+    error.age = "Age must be an integer between 16 and 100";
+  }
+
+  let pincode = formData?.pincode;
+  if (
+    typeof pincode !== "string" ||
+    pincode.length !== 6 ||
+    pincode.startsWith("0")
+  ) {
+    error.pincode = "Invalid Indian pincode";
+  } else {
+    for (let i = 0; i < pincode.length; i++) {
+      if (pincode[i] < "0" || pincode[i] > "9") {
+        error.pincode = "Invalid Indian pincode";
+        break;
+      }
+    }
+  }
+
+  const state = formData?.state?.trim() ?? "";
+  if(state.length === 0){
+    error.state = "State is required";
+  }
+
+  const agreeTerms = formData?.agreeTerms;
+  if (!Boolean(agreeTerms)) {
+    error.agreeTerms = "Must agree to terms";
+  }
+  
+  let isValid = false;
+  if(error.length === 0){
+    isValid = true;
+    return { isValid: isValid, errors: {error} };
+  }
+
+  return {
+    isValid: Object.keys(error).length === 0,
+    errors: error,
+  };
 }

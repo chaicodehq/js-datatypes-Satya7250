@@ -48,4 +48,75 @@
  */
 export function analyzeUPITransactions(transactions) {
   // Your code here
+  if(!Array.isArray(transactions) || transactions.length === 0) return null;
+  const validTransactions = transactions.filter((obj) => {
+    return (
+      obj &&
+      (obj.type === "credit" || obj.type === "debit") &&
+      typeof obj.amount === "number" &&
+      obj.amount > 0
+    )
+  })
+
+  if(validTransactions.length === 0) return null;
+
+  const totalCredit = validTransactions
+  .filter((tp) => tp.type === "credit")
+  .reduce((sum,tnx) => sum+tnx.amount,0);
+
+  const totalDebit = validTransactions
+  .filter((tp) => tp.type === "debit")
+  .reduce((sum,tnx) => sum+tnx.amount,0);
+
+  const netBalance = (totalCredit - totalDebit);
+  const transactionCount = validTransactions.length;
+  const totalAmount = validTransactions.reduce((sum,total) => sum+total.amount,0);
+  const avgTransaction = Math.round(totalAmount/transactionCount);
+
+  const highestTransaction = validTransactions.reduce((max,tnx) => {
+    return tnx.amount > max.amount? tnx : max;
+  });
+
+  const categoryBreakdown = validTransactions.reduce((acc,tnx) => {
+    if(!acc[tnx.category]){
+      acc[tnx.category] = 0;
+    }
+    acc[tnx.category] += tnx.amount;
+    return acc;
+  },{})
+
+  const contactFrequency = {};
+  let frequentContact = validTransactions[0].to;
+  let maxCount = 0;
+
+  validTransactions.forEach((txn) => {
+    contactFrequency[txn.to] = (contactFrequency[txn.to] || 0) + 1;
+
+    if (contactFrequency[txn.to] > maxCount) {
+      maxCount = contactFrequency[txn.to];
+      frequentContact = txn.to;
+    }
+  });
+
+  const allAbove100 = validTransactions.every(
+    (txn) => txn.amount > 100
+  );
+
+  const hasLargeTransaction = validTransactions.some(
+    (txn) => txn.amount >= 5000
+  );
+
+  return {
+    totalCredit,
+    totalDebit,
+    netBalance,
+    transactionCount,
+    avgTransaction,
+    highestTransaction,
+    categoryBreakdown,
+    frequentContact,
+    allAbove100,
+    hasLargeTransaction,
+  };
+
 }

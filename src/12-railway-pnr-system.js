@@ -71,6 +71,7 @@
  *   //      passengers: [...], summary: { ..., allConfirmed: true }, chartPrepared: true }
  */
 export function processRailwayPNR(pnrData) {
+  
   if (!pnrData || typeof pnrData !== 'object') return null;
   if (typeof pnrData.pnr !== 'string') return null;
   if (pnrData.pnr.length !== 10 || !/^\d{10}$/.test(pnrData.pnr)) return null;
